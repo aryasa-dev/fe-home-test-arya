@@ -1,8 +1,9 @@
 "use client";
 import { Hero } from "@/components/Hero";
+import { Pagination } from "@/components/Pagination";
 import { useApi } from "@/hooks/useApi";
 import { formattedDate } from "@/lib/utils";
-import { ArticleResponse } from "@/types";
+import { ArticlesResponse } from "@/types";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -11,7 +12,7 @@ export default function Home() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const { data, loading, refetch } = useApi<ArticleResponse>(
+  const { data, loading, refetch } = useApi<ArticlesResponse>(
     {
       method: "GET",
       path: "articles",
@@ -38,10 +39,9 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [search, category, page, limit]);
 
-  console.log(data);
   return (
     <>
-      <Hero />
+      <Hero categoryValue={category} setCategoryValue={setCategory} searchValue={search} setSearchValue={setSearch} />
 
       {/* List */}
       <section className="py-10 min-h-screen">
@@ -52,7 +52,7 @@ export default function Home() {
                 Showing: {data.data.length} of {data.total}
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-[60px] mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-[60px] mt-6 mb-10">
                 {data.data.map((article) => (
                   <div key={article.id} className="">
                     <Image
@@ -81,6 +81,8 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
+              <Pagination current={page} onChange={p => setPage(p)} perPage={limit} total={data.total} />
             </>
           ) : (
             <p>Loading..</p>

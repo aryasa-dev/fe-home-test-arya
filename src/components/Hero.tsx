@@ -11,10 +11,22 @@ import {
 } from "@/components/ui/select";
 import { SearchIcon } from "lucide-react";
 import { Input } from "./ui/input";
+import { useApi } from "@/hooks/useApi";
+import { CategoriesResponse } from "@/types";
 
-type Props = {};
+type HeroProps = {
+  categoryValue: string
+  setCategoryValue: (value: string) => void
+  searchValue: string
+  setSearchValue: (value: string) => void
+};
 
-export function Hero({}: Props) {
+export function Hero({categoryValue,setCategoryValue,searchValue,setSearchValue}: HeroProps) {
+  const {data,loading} = useApi<CategoriesResponse>({
+    method: "GET",
+    path: 'categories',
+    auth: true,
+  })
   return (
     <section className="min-h-[500px] bg-[url('/images/bg-hero.png')] bg-cover flex place-content-center items-center text-center">
       <div className="max-w-3xl mx-auto">
@@ -27,18 +39,16 @@ export function Hero({}: Props) {
         </div>
 
         <div className="grid grid-cols-3 gap-2 mt-10 max-w-xl mx-auto bg-blue-500 rounded-[12px] p-2.5">
-          <Select>
+          <Select onValueChange={setCategoryValue} value={categoryValue}>
             <SelectTrigger className="bg-white !p-3 w-full">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Category</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
+                {data?.data.filter(item => item.id !== '').map((category) => (
+                  <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -48,6 +58,10 @@ export function Hero({}: Props) {
             <Input
               placeholder="Search articles"
               type="search"
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value)
+              }}
               className="border-none outline-none focus-visible:ring-transparent focus-visible:border-none"
             />
           </div>
