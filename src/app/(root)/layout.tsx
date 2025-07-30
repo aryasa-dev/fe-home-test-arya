@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Archivo } from "next/font/google";
 import "../globals.css";
-import { redirect } from "next/navigation";
-import Cookies from "js-cookie";
-import { getAuthUser } from "@/lib/auth";
-import { cookies } from "next/headers";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
-const inter = Inter({
+const archivo = Archivo({
   subsets: ["latin"],
+  display: "swap"
 });
 
 export const metadata: Metadata = {
@@ -22,15 +19,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isLogin = cookies().get("ACCESS_TOKEN")
-  if (!isLogin) {
-    redirect('/login')
-  }
-
   return (
     <html lang="en">
       <body
-        className={`${inter.className} antialiased`}
+        className={`${archivo.className} antialiased`}
       >
         <Navbar />
         {children}

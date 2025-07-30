@@ -1,27 +1,78 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useApi } from "@/hooks/useApi";
+import { User } from "@/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOutIcon } from "lucide-react";
+import Cookies from "js-cookie";
+import { usePathname, useRouter } from "next/navigation";
 
-type Props = {}
+
+type Props = {};
 
 export function Navbar({}: Props) {
-  return (
-    <header className='absolute top-0 left-0 right-0 w-full py-3'>
-        <nav className='bg-transparent'>
-            <div className="container">
-                <div className="flex items-center justify-between">
-                    <Link href={"/"}><Image src={'/images/logo.png'} alt='logo' width={200} height={150} className='w-auto h-auto' /></Link>
+  const { data } = useApi<User>({
+    method: "GET",
+    path: "auth/profile",
+    auth: true,
+  });
 
-                    <div className="flex">
-                        <Avatar>
-                            <AvatarFallback></AvatarFallback>
-                        </Avatar>
-                        <p className='font-medium underline text-white'>James</p>
-                    </div>
-                </div>
-            </div>
-        </nav>
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleLogout = () => {
+    Cookies.remove("ACCESS_TOKEN")
+    router.push("/login")
+  }
+  return (
+    <header className={`absolute top-0 left-0 right-0 w-full py-3 border-b h-16 flex flex-col justify-center ${pathname !== '/articles' ? 'border-b-slate-200' : 'border-b-transparent'}`}>
+      <nav className="bg-transparent">
+        <div className="container">
+          <div className="flex items-center justify-between">
+            <Link href={"/"}>
+              <Image
+                src={"/images/logo.png"}
+                alt="logo"
+                width={200}
+                height={150}
+                className="w-auto h-auto"
+              />
+            </Link>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-x-2">
+                <Avatar>
+                  <AvatarFallback className="bg-blue-200 text-blue-900 font-medium">
+                    {data?.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="font-medium underline text-white">
+                  {data?.username}
+                </p>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/profile")}>
+                  My Account
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex items-center gap-x-1.5 text-red-500 cursor-pointer group" onClick={handleLogout}>
+                  <LogOutIcon className="text-red-500" />
+                  <span className="group-hover:text-red-500">Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </nav>
     </header>
-  )
+  );
 }

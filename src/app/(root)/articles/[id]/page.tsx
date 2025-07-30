@@ -64,7 +64,7 @@ export default function DetailArticle({}: Props) {
               alt={data.title}
               width={800}
               height={400}
-              className="w-full h-auto max-h-[480px] my-10 rounded object-cover"
+              className="w-full h-auto max-h-[480px] my-10 rounded-lg object-cover"
             />
 
             <data dangerouslySetInnerHTML={{ __html: data.content }} />
