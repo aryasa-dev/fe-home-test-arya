@@ -1,21 +1,21 @@
 import { apiRequest } from "@/utils/api";
 import { useEffect, useState } from "react";
 
-interface UseApiOptions {
+interface UseApiOptions<T = any> {
   manual?: boolean;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: T) => void;
   onError?: (err: any) => void;
 }
 
-export const useApi = (
+export const useApi = <T = any>(
   requestProps: Parameters<typeof apiRequest>[0],
-  options?: UseApiOptions
+  options?: UseApiOptions<T>
 ) => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(!options?.manual);
   const [error, setError] = useState<any>(null);
 
-  const fetchData = async (overrideProps?: Partial<typeof requestProps>) => {
+  const fetchData = async (overrideProps?: Partial<Parameters<typeof apiRequest>[0]>) => {
     setLoading(true);
     setError(null);
 

@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import Cookies from "js-cookie";
 import { getAuthUser } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +23,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const isLogin = cookies().get("ACCESS_TOKEN")
-  console.log(isLogin)
   if (!isLogin) {
     redirect('/login')
   }
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased`}
       >
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
