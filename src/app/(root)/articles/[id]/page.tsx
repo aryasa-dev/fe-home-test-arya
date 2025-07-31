@@ -43,7 +43,6 @@ export default function DetailArticle({}: Props) {
       .slice(0, 3);
   }, [articles, params.id]);
 
-  console.log(data);
   return (
     <section className="min-h-screen pt-20 pb-10">
       <div className="container">

@@ -26,7 +26,7 @@ export default function AdminLayout({
         <SidebarProvider>
           <AppSidebar />
           <Navbar isAdmin />
-          <main className="pt-20">{children}</main>
+          <main className="pt-20 pb-10 w-full">{children}</main>
         </SidebarProvider>
       </body>
     </html>

@@ -15,6 +15,7 @@ import {
 import { LogOutIcon } from "lucide-react";
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
+import { getPageTitle } from "@/lib/utils";
 
 type NavbarProps = {
   isAdmin?: boolean;
@@ -55,7 +56,7 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
                 />
               </Link>
             ) : (
-              <h2>{pathname}</h2>
+              <h2 className="font-semibold text-xl text-slate-900">{getPageTitle(pathname)}</h2>
             )}
 
             <DropdownMenu>
