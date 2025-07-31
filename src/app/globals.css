@@ -125,3 +125,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.ql-toolbar.ql-snow, .ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+}
+
+.ql-toolbar.ql-snow {
+  border-bottom: 1px solid #ccc !important;
+}

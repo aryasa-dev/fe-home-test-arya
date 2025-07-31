@@ -23,7 +23,7 @@ export const articlesColumns: ColumnDef<Article>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      return <p className="max-w-sm mx-auto">{row.getValue("title")}</p>;
+      return <p className="max-w-sm mx-auto text-left">{row.getValue("title")}</p>;
     },
   },
   {

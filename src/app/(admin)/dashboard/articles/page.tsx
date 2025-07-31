@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
 import { articlesColumns } from "./columns";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
@@ -38,6 +39,7 @@ export default function DashboardArticlesPage({}: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const router = useRouter()
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -77,7 +79,7 @@ export default function DashboardArticlesPage({}: Props) {
                 />
               </div>
 
-              <Button>
+              <Button onClick={() => router.push("articles/create")}>
                 <PlusIcon /> Add Articles
               </Button>
             </div>
