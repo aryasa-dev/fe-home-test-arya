@@ -1,3 +1,7 @@
+export interface LoginResponse {
+  token: string
+  role: "User" | "Admin"
+}
 export interface User {
   id: string;
   username: string;

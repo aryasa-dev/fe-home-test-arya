@@ -20,6 +20,7 @@ import { ChevronDownIcon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { LoginResponse } from "@/types";
 
 type Props = {};
 
@@ -45,7 +46,7 @@ export default function RegisterPage({}: Props) {
     }
   );
 
-  const loginApi = useApi(
+  const loginApi = useApi<LoginResponse>(
     {
       method: "POST",
       path: "auth/login",
@@ -71,7 +72,13 @@ export default function RegisterPage({}: Props) {
       const token = res.token;
       if (token) {
         Cookies.set("ACCESS_TOKEN", token);
-        router.push("/");
+        Cookies.set("USER_ROLE", res.role)
+
+        if (res.role === "User") {
+          router.push("/articles");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (err) {
       console.error("Register or Login failed:", err);
@@ -136,7 +143,7 @@ export default function RegisterPage({}: Props) {
           />
           <Button type="submit" className="w-full mt-6" disabled={form.formState.isSubmitting}>
             {registerApi.loading ? (
-              <span>
+              <span className="flex items-center gap-x-1">
                 <Loader2Icon className="animate-spin" /> Loading
               </span>
             ) : (

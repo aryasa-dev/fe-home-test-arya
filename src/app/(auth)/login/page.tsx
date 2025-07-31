@@ -18,6 +18,8 @@ import { useApi } from "@/hooks/useApi";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { Loader2Icon } from "lucide-react";
+import { LoginResponse } from "@/types";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -27,8 +29,9 @@ export default function LoginPage() {
       password: "",
     },
   });
+  const router = useRouter()
 
-  const { loading, error, refetch } = useApi(
+  const { loading, error, refetch } = useApi<LoginResponse>(
     {
       method: "POST",
       path: "auth/login",
@@ -38,7 +41,15 @@ export default function LoginPage() {
       manual: true,
       onSuccess: (res) => {
         Cookies.set("ACCESS_TOKEN", res.token);
-        window.location.href = "/";
+        Cookies.set("USER_ROLE", res.role)
+        console.log(res)
+
+        if (res.role === "User") {
+          router.push("/articles")
+        } else {
+          router.push("/dashboard")
+        }
+        // window.location.href = "/";
       },
       onError: (err) => {
         console.error(err.response?.data);
