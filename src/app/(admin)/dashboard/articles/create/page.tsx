@@ -23,6 +23,7 @@ import { CategoriesResponse } from "@/types";
 import UploadImage from "@/components/UploadImage";
 import Link from "next/link";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { uploadImage } from "@/services";
 
 type Props = {};
 
@@ -30,8 +31,9 @@ export default function CreateArticlePage({}: Props) {
   const router = useRouter();
   const form = useForm<z.infer<typeof createArticleSchema>>({
     resolver: zodResolver(createArticleSchema),
-    //   defaultValues: {
-    //   },
+    defaultValues: {
+      thumbnail: null,
+    },
   });
 
   const categories = useApi<CategoriesResponse>({
@@ -40,37 +42,42 @@ export default function CreateArticlePage({}: Props) {
     auth: true,
   });
 
-  const { refetch } = useApi(
+  const { refetch: addArticle, loading: isSubmitting } = useApi(
     {
       method: "POST",
       path: "articles",
       auth: true,
-      bodyRequest: undefined,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      bodyRequest: {},
     },
     {
       manual: true,
-      onSuccess: (res) => {
-        console.log(res);
+      onSuccess: () => {
+        alert("Article created successfully");
+        router.push("/dashboard/articles");
       },
-      onError: (err) => {
-        console.error(err);
+      onError: () => {
+        alert("Failed to create article");
       },
     }
   );
 
   async function onSubmit(values: z.infer<typeof createArticleSchema>) {
-    console.log(values);
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("content", values.content);
-    formData.append("category", values.category);
-    formData.append("imageUrl", values.thumbnail);
+    let imageUrl: string | null = null;
 
-    await refetch({
-      bodyRequest: formData,
+    if (values.thumbnail instanceof File) {
+      imageUrl = await uploadImage(values.thumbnail);
+    }
+
+    const { thumbnail, category, ...rest } = values;
+
+    const payload = {
+      ...rest,
+      imageUrl,
+      categoryId: category,
+    };
+    // console.log(payload)
+    await addArticle({
+      bodyRequest: payload,
     });
   }
   return (
@@ -166,10 +173,8 @@ export default function CreateArticlePage({}: Props) {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      {/* <FormLabel>Title</FormLabel> */}
                       <FormControl>
                         <RichTextEditor {...field} />
-                        {/* <Input placeholder="Input Title" {...field} /> */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -185,14 +190,13 @@ export default function CreateArticlePage({}: Props) {
                   </Button>
                   <Button variant={"ghost"}>Preview</Button>
                   <Button type="submit" disabled={form.formState.isSubmitting}>
-                    Upload
-                    {/* {registerApi.loading ? (
-                    <span className="flex items-center gap-x-1">
-                      <Loader2Icon className="animate-spin" /> Loading
-                    </span>
-                  ) : (
-                    "Register"
-                  )} */}
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-x-1">
+                        <Loader2Icon className="animate-spin" /> Loading
+                      </span>
+                    ) : (
+                      "Upload"
+                    )}
                   </Button>
                 </div>
               </form>
