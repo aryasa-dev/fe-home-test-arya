@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { formattedDateAndTime } from "@/lib/utils";
 import { Article } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 export const articlesColumns: ColumnDef<Article>[] = [
   {
@@ -23,7 +24,9 @@ export const articlesColumns: ColumnDef<Article>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      return <p className="max-w-sm mx-auto text-left">{row.getValue("title")}</p>;
+      return (
+        <p className="max-w-sm mx-auto text-left">{row.getValue("title")}</p>
+      );
     },
   },
   {
@@ -45,7 +48,9 @@ export const articlesColumns: ColumnDef<Article>[] = [
       return (
         <div className="flex items-center justify-center">
           <Button variant={"link"}>Preview</Button>
-          <Button variant={"link"}>Edit</Button>
+          <Link href={`articles/edit/${row.original.id}`}>
+            <Button variant={"link"}>Edit</Button>
+          </Link>
           <Button variant={"link"} className="text-red-500">
             Delete
           </Button>

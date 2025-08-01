@@ -42,7 +42,6 @@ export default function LoginPage() {
       onSuccess: (res) => {
         Cookies.set("ACCESS_TOKEN", res.token);
         Cookies.set("USER_ROLE", res.role)
-        console.log(res)
 
         if (res.role === "User") {
           router.push("/articles")

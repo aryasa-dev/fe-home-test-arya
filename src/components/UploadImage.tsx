@@ -8,9 +8,14 @@ import Image from "next/image";
 interface UploadImageProps {
   onChange: (file: File) => void;
   error?: string;
+  onDelete?: () => void;
 }
 
-export default function UploadImage({ onChange, error }: UploadImageProps) {
+export default function UploadImage({
+  onChange,
+  error,
+  onDelete,
+}: UploadImageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -27,6 +32,11 @@ export default function UploadImage({ onChange, error }: UploadImageProps) {
     fileInputRef.current?.click();
   };
 
+  const handleDelete = () => {
+    setPreview(null);
+    onDelete?.();
+  };
+
   useEffect(() => {
     return () => {
       if (preview) {
@@ -40,23 +50,45 @@ export default function UploadImage({ onChange, error }: UploadImageProps) {
       <Label>Thumbnails</Label>
       <div
         onClick={handleClick}
-        className="border-dashed border-2 border-gray-300 p-6 rounded-xl text-center cursor-pointer hover:bg-gray-50 transition h-40 flex flex-col items-center justify-center"
+        className={`${!preview ? "border-dashed border-2 p-6 text-center cursor-pointer hover:bg-gray-50 transition flex flex-col items-center justify-center" : "p-3 border"} rounded-sm max-w-56 min-h-40 max-h-48 border-border`}
       >
-        <input
-          type="file"
-          accept=".jpg,.jpeg,.png"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-        />
-        {preview ? (
-          <Image
-            src={preview}
-            alt="preview"
-            width={400}
-            height={400}
-            className="mx-auto object-contain rounded-md"
+        {!preview ? (
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
           />
+        ) : null}
+        {preview ? (
+          <>
+            <Image
+              src={preview}
+              alt="preview"
+              width={400}
+              height={400}
+              className="w-full max-h-28 rounded-sm"
+            />
+            <div className="flex items-center justify-center gap-3 mt-3">
+              <Label className="text-blue-600 cursor-pointer underline">
+                Changes
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </Label>
+
+              <Label
+                className="text-red-600 underline cursor-pointer"
+                onClick={handleDelete}
+              >
+                Delete
+              </Label>
+            </div>
+          </>
         ) : (
           <div className="flex flex-col items-center text-slate-500">
             <ImagePlus size={20} className="mb-3" />
