@@ -19,7 +19,7 @@ type SelectComponentProps = {
   setValue: (value: string) => void;
 };
 
-export default function SelectComponent({
+export function SelectComponent({
   data,
   label,
   setValue,

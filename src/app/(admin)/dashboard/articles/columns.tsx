@@ -1,12 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { TableRowActions } from "@/components/TableRowActions";
 import { formattedDateAndTime } from "@/lib/utils";
 import { Article } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 
-export const articlesColumns: ColumnDef<Article>[] = [
+export const getArticleColumns = (onSuccessDelete: () => void): ColumnDef<Article>[] => [
   {
     accessorKey: "imageUrl",
     header: "Thumbnails",
@@ -46,15 +45,11 @@ export const articlesColumns: ColumnDef<Article>[] = [
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <div className="flex items-center justify-center">
-          <Button variant={"link"}>Preview</Button>
-          <Link href={`articles/edit/${row.original.id}`}>
-            <Button variant={"link"}>Edit</Button>
-          </Link>
-          <Button variant={"link"} className="text-red-500">
-            Delete
-          </Button>
-        </div>
+        <TableRowActions
+          linkToEdit={`articles/edit/${row.original.id}`}
+          deletePath={`articles/${row.original.id}`}
+          onSuccessDelete={onSuccessDelete}
+        />
       );
     },
   },

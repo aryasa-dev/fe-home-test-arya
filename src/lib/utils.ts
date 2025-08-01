@@ -49,10 +49,31 @@ export function getPagination(
 }
 
 export function getPageTitle(pathname: string) {
+  if (!pathname) return "";
+
   const segments = pathname.split("/").filter(Boolean);
-  const last = segments[segments.length - 1] || "";
-  return last.charAt(0).toUpperCase() + last.slice(1);
+
+  const keywords = ["edit", "create"];
+
+  const keywordMatch = segments.find((seg) =>
+    keywords.includes(seg.toLowerCase())
+  );
+
+  if (keywordMatch) {
+    return capitalize(keywordMatch);
+  }
+
+  const fallback = segments
+    .reverse()
+    .find((seg) => seg.length < 20 && isNaN(Number(seg)));
+
+  return fallback ? capitalize(fallback) : "Dashboard";
 }
+
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 
 export function formattedDateAndTime(isoDate: string) {
   const date = new Date(isoDate);

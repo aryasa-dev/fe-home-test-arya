@@ -11,7 +11,10 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard Admin",
+  title: {
+    default: "Dashboard Admin",
+    template: "Dashboard - %s"
+  },
   description: "Dashboard Admin",
 };
 
