@@ -58,3 +58,7 @@ export const editArticleSchema = z.object({
       }
     ),
 });
+
+export const createCategory = z.object({
+  name: z.string().min(1, {error: "Category field cannot be empty"})
+})

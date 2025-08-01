@@ -9,12 +9,14 @@ type TableRowActionsProps = {
   linkToEdit: string;
   deletePath: string;
   onSuccessDelete?: () => void
+  withPreview?: boolean
 };
 
 export function TableRowActions({
   linkToEdit,
   deletePath,
-  onSuccessDelete
+  onSuccessDelete,
+  withPreview = true
 }: TableRowActionsProps) {
   const [openAlert, setOpenAlert] = useState(false);
   const { refetch: deleteItem, loading: deleteLoading } = useApi(
@@ -40,7 +42,7 @@ export function TableRowActions({
   return (
     <>
       <div className="flex items-center justify-center">
-        <Button variant={"link"}>Preview</Button>
+        {withPreview && <Button variant={"link"}>Preview</Button>}
         <Link href={linkToEdit}>
           <Button variant={"link"}>Edit</Button>
         </Link>

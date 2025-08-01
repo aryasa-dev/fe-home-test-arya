@@ -18,12 +18,12 @@ import { LogOutIcon, NewspaperIcon, TagIcon } from "lucide-react"
 const items = [
   {
     title: "Articles",
-    url: "/admin/articles",
+    url: "/dashboard/articles",
     icon: NewspaperIcon,
   },
   {
     title: "Category",
-    url: "/admin/category",
+    url: "/dashboard/category",
     icon: TagIcon,
   },
   {
