@@ -24,7 +24,7 @@ export function ArticleCard({
   return (
     <div>
       <Image
-        src={imageUrl}
+        src={imageUrl ?? '/images/article-img.png'}
         alt={title}
         width={400}
         height={400}

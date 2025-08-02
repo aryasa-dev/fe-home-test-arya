@@ -60,7 +60,7 @@ export function ArticlesContent({}: Props) {
     <Card className="w-full h-full">
       <CardHeader className="p-0">
         <div className="pb-6 px-6">
-          <p>Total Articles</p>
+          <p>Total Articles: {articles?.total}</p>
         </div>
         <Separator />
         <div className="flex items-center justify-between p-6">

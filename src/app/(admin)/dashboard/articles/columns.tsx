@@ -12,9 +12,9 @@ export const getArticleColumns = (onSuccessDelete: () => void): ColumnDef<Articl
     cell: ({ row }) => {
       return (
         <img
-          src={row.getValue("imageUrl")}
+          src={row.getValue("imageUrl") ?? '/images/article-img.png'}
           alt={row.getValue("title")}
-          className="w-[60px] h-[60px] rounded-[6px] mx-auto"
+          className="w-[60px] h-[60px] rounded-[6px] mx-auto object-cover"
         />
       );
     },
@@ -48,6 +48,7 @@ export const getArticleColumns = (onSuccessDelete: () => void): ColumnDef<Articl
         <TableRowActions
           linkToEdit={`articles/edit/${row.original.id}`}
           deletePath={`articles/${row.original.id}`}
+          linkToPreview={`articles/preview/${row.original.id}`}
           onSuccessDelete={onSuccessDelete}
         />
       );

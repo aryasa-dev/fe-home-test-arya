@@ -1,0 +1,104 @@
+"use client";
+import { ArticleCard } from "@/components/ArticleCard";
+import { useApi } from "@/hooks/useApi";
+import { formattedDate } from "@/lib/utils";
+import { Article, ArticlesResponse } from "@/types";
+import { ArrowLeftIcon } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo } from "react";
+
+type PreviewArticleContentProps = {
+  id: string;
+};
+
+export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
+  const { data, loading } = useApi<Article>({
+    method: "GET",
+    path: `articles/${id}`,
+    auth: true,
+  });
+  const router = useRouter();
+
+  const { data: articles, refetch } = useApi<ArticlesResponse>(
+    {
+      method: "GET",
+      path: "articles",
+      auth: true,
+      params: {},
+    },
+    {
+      manual: true,
+    }
+  );
+
+  useEffect(() => {
+    refetch({
+      params: {
+        category: data?.categoryId || undefined,
+      },
+    });
+  }, [data, id]);
+
+  const otherArticles = useMemo(() => {
+    return articles?.data.filter((item: any) => item.id !== id).slice(0, 3);
+  }, [articles, id]);
+
+  return (
+    <section className="min-h-screen pb-10">
+      <div className="container">
+        <div className="flex items-center gap-3 pb-5">
+          <ArrowLeftIcon
+            onClick={() => router.push("/dashboard/articles")}
+            className="cursor-pointer"
+          />
+          <p className="font-medium text-slate-900">Preview Article</p>
+        </div>
+        {!loading && data ? (
+          <div>
+            <div className="flex items-center justify-center gap-x-1.5 text-slate-600 font-medium text-sm">
+              <p>{formattedDate(data.createdAt)}</p>
+              <div className="w-1 h-1 bg-slate-600 rounded-full" />
+              <p>Created by {data.user.username}</p>
+            </div>
+
+            <h2 className="text-3xl font-semibold text-slate-900 mt-4 max-w-2xl text-center mx-auto">
+              {data.title}
+            </h2>
+
+            <Image
+              src={data.imageUrl ?? '/images/article-img.png'}
+              alt={data.title}
+              width={800}
+              height={400}
+              className="w-full h-auto max-h-[480px] my-10 rounded-lg object-cover"
+            />
+
+            <data dangerouslySetInnerHTML={{ __html: data.content }} />
+
+            <div className="mt-20">
+              <b className="text-xl font-bold text-slate-900 block mb-6">
+                Other articles
+              </b>
+              <div className="grid grid-cols-3 gap-10">
+                {otherArticles?.map((article) => (
+                  <ArticleCard
+                    key={article.id}
+                    category={article.category}
+                    content={article.content}
+                    createdAt={article.createdAt}
+                    id={article.id}
+                    imageUrl={article.imageUrl}
+                    title={article.title}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+    </section>
+  );
+}

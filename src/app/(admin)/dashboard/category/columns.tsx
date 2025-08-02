@@ -30,7 +30,6 @@ export const getCategoryColumns = (
           deletePath={`categories/${row.original.id}`}
           onSuccessDelete={onSuccessDelete}
           onEditAction={() => onEditAction(row.original.id)}
-          withPreview={false}
           alertTitle="Category"
           alertDescription={`Delete category "${row.getValue("name")}"? This will remove it from master data permanently.`}
         />
