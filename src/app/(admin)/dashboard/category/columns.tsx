@@ -5,7 +5,10 @@ import { formattedDateAndTime } from "@/lib/utils";
 import { Category } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const getCategoryColumns = (onSuccessDelete: () => void): ColumnDef<Category>[] => [
+export const getCategoryColumns = (
+  onSuccessDelete: () => void,
+  onEditAction: (id: string) => void
+): ColumnDef<Category>[] => [
   {
     accessorKey: "name",
     header: "Category",
@@ -24,10 +27,12 @@ export const getCategoryColumns = (onSuccessDelete: () => void): ColumnDef<Categ
     cell: ({ row }) => {
       return (
         <TableRowActions
-          linkToEdit={`category/edit/${row.original.id}`}
           deletePath={`categories/${row.original.id}`}
           onSuccessDelete={onSuccessDelete}
+          onEditAction={() => onEditAction(row.original.id)}
           withPreview={false}
+          alertTitle="Category"
+          alertDescription={`Delete category "${row.getValue("name")}"? This will remove it from master data permanently.`}
         />
       );
     },

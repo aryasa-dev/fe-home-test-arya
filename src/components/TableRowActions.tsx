@@ -6,17 +6,23 @@ import { useApi } from "@/hooks/useApi";
 import AlertAction from "./AlertAction";
 
 type TableRowActionsProps = {
-  linkToEdit: string;
+  alertTitle?: string;
+  alertDescription?: string;
+  linkToEdit?: string;
   deletePath: string;
-  onSuccessDelete?: () => void
-  withPreview?: boolean
+  onSuccessDelete?: () => void;
+  onEditAction?: () => void;
+  withPreview?: boolean;
 };
 
 export function TableRowActions({
+  alertTitle,
+  alertDescription,
   linkToEdit,
   deletePath,
   onSuccessDelete,
-  withPreview = true
+  onEditAction,
+  withPreview = true,
 }: TableRowActionsProps) {
   const [openAlert, setOpenAlert] = useState(false);
   const { refetch: deleteItem, loading: deleteLoading } = useApi(
@@ -28,8 +34,8 @@ export function TableRowActions({
     {
       manual: true,
       onSuccess: () => {
-        alert("Item deleted successfully")
-        onSuccessDelete?.()
+        alert("Item deleted successfully");
+        onSuccessDelete?.();
       },
       onError: () => alert("Failed to delete item"),
     }
@@ -43,10 +49,20 @@ export function TableRowActions({
     <>
       <div className="flex items-center justify-center">
         {withPreview && <Button variant={"link"}>Preview</Button>}
-        <Link href={linkToEdit}>
-          <Button variant={"link"}>Edit</Button>
-        </Link>
-        <Button variant={"link"} className="text-red-500" onClick={() => setOpenAlert(true)}>
+        {linkToEdit ? (
+          <Link href={linkToEdit}>
+            <Button variant={"link"}>Edit</Button>
+          </Link>
+        ) : (
+          <Button variant={"link"} onClick={onEditAction}>
+            Edit
+          </Button>
+        )}
+        <Button
+          variant={"link"}
+          className="text-red-500"
+          onClick={() => setOpenAlert(true)}
+        >
           Delete
         </Button>
       </div>
@@ -55,6 +71,8 @@ export function TableRowActions({
         showDeleteDialog={openAlert}
         isLoading={deleteLoading}
         onAction={handleDelete}
+        title={alertTitle}
+        description={alertDescription}
       />
     </>
   );

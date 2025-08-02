@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PlusIcon } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { getCategoryColumns } from "./columns";
 import { useApi } from "@/hooks/useApi";
-import { CategoriesResponse } from "@/types";
+import { CategoriesResponse, Category } from "@/types";
 import { FormDialog } from "@/components/FormDialog";
 import {
   Form,
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { createCategory } from "@/schemas";
+import { createCategory, editCategory } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { ButtonLoader } from "@/components/ButtonLoader";
@@ -28,13 +28,20 @@ import { ButtonLoader } from "@/components/ButtonLoader";
 type Props = {};
 
 export default function DashboardCategoryContent({}: Props) {
-  const form = useForm<z.infer<typeof createCategory>>({
+  const formCreate = useForm<z.infer<typeof createCategory>>({
     resolver: zodResolver(createCategory),
+  });
+  const formEdit = useForm<z.infer<typeof editCategory>>({
+    resolver: zodResolver(editCategory),
   });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showEditCategory, setShowEditCategory] = useState(false);
+  const [idCategory, setIdCategory] = useState<string | null>(null);
+
+  // get categories
   const getCategories = useApi<CategoriesResponse>(
     {
       method: "GET",
@@ -44,12 +51,14 @@ export default function DashboardCategoryContent({}: Props) {
     },
     { manual: true }
   );
-  const columns = useMemo(
-    () => getCategoryColumns(() => getCategories.refetch({ params: { page } })),
-    [getCategories.refetch, page]
+
+  // get category detail
+  const getCategoryDetail = getCategories.data?.data.find(
+    (item) => item.id === idCategory
   );
 
-  const {loading, refetch} = useApi<CategoriesResponse>(
+  // post category
+  const { loading, refetch } = useApi(
     {
       method: "POST",
       path: "categories",
@@ -60,19 +69,61 @@ export default function DashboardCategoryContent({}: Props) {
       manual: true,
       onSuccess: () => {
         alert("Category created successfully");
-        setShowAddCategory(false)
-        getCategories.refetch()
+        setShowAddCategory(false);
+        getCategories.refetch();
       },
       onError: () => {
-        alert("Failed to create category")
-      }
+        alert("Failed to create category");
+      },
     }
   );
 
-  async function onSubmit(values: z.infer<typeof createCategory>) {
+  // edit category
+  const { loading: editLoading, refetch: editCategoryRefetch } = useApi(
+    {
+      method: "PUT",
+      path: `categories/${idCategory}`,
+      auth: true,
+      bodyRequest: {},
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        alert("Category edited successfully");
+        setShowEditCategory(false);
+        getCategories.refetch();
+      },
+      onError: () => {
+        alert("Failed to edit category");
+      },
+    }
+  );
+
+  const handleEdit = useCallback((id: string) => {
+    setShowEditCategory(true);
+    setIdCategory(id);
+  }, []);
+
+  const columns = useMemo(
+    () =>
+      getCategoryColumns(
+        () => getCategories.refetch({ params: { page } }),
+        handleEdit
+      ),
+    [getCategories.refetch, page, handleEdit]
+  );
+
+  async function onCreateSubmit(values: z.infer<typeof createCategory>) {
     await refetch({
-        bodyRequest: values
-    })
+      bodyRequest: values,
+    });
+  }
+
+  async function onEditSubmit(values: z.infer<typeof createCategory>) {
+    console.log(values);
+    await editCategoryRefetch({
+      bodyRequest: values,
+    });
   }
 
   useEffect(() => {
@@ -89,33 +140,51 @@ export default function DashboardCategoryContent({}: Props) {
     return () => clearTimeout(timeout);
   }, [page, limit, search]);
 
+  useEffect(() => {
+    if (idCategory && getCategoryDetail) {
+      formEdit.reset(
+        {
+          name: getCategoryDetail.name || "",
+        },
+        {
+          keepDirtyValues: true,
+        }
+      );
+    }
+  }, [idCategory, getCategoryDetail, formEdit]);
+
+  if (getCategories.loading) return <p>Loading...</p>
+
   return (
     <>
-      <Card className="w-full h-full">
-        <CardHeader className="p-0">
-          <div className="pb-6 px-6">
-            <p>Total Category: {getCategories.data?.totalData}</p>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-x-2">
-              <SearchInput
-                value={search}
-                setValue={setSearch}
-                placeholder="Search by title"
-              />
+      {/* {!getCategories.loading ? ( */}
+        <Card className="w-full h-full">
+          <CardHeader className="p-0">
+            <div className="pb-6 px-6">
+              <p>Total Category: {getCategories.data?.totalData}</p>
             </div>
+            <Separator />
+            <div className="flex items-center justify-between p-6">
+              <div className="flex items-center gap-x-2">
+                <SearchInput
+                  value={search}
+                  setValue={setSearch}
+                  placeholder="Search by title"
+                />
+              </div>
 
-            <Button onClick={() => setShowAddCategory(true)}>
-              <PlusIcon /> Add Category
-            </Button>
-          </div>
-        </CardHeader>
-        <Separator />
-        <CardContent className="p-0 mt-0">
-          {getCategories.loading && !getCategories.data?.data ? (
-            <p className="p-6">Loading..</p>
-          ) : (
+              <Button
+                onClick={() => {
+                  setIdCategory(null);
+                  setShowAddCategory(true);
+                }}
+              >
+                <PlusIcon /> Add Category
+              </Button>
+            </div>
+          </CardHeader>
+          <Separator />
+          <CardContent className="p-0 mt-0">
             <DataTable
               columns={columns}
               data={getCategories.data?.data ?? []}
@@ -124,18 +193,25 @@ export default function DashboardCategoryContent({}: Props) {
               totalItems={getCategories.data?.totalData ?? 0}
               onPageChange={(newPage) => setPage(newPage)}
             />
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      {/* ) : (
+        <p className="p-6">Loading..</p>
+      )} */}
+
+      {/* Create Category */}
       <FormDialog
         openDialog={showAddCategory}
         setOpenDialog={setShowAddCategory}
         title="Add Category"
       >
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Form {...formCreate}>
+          <form
+            onSubmit={formCreate.handleSubmit(onCreateSubmit)}
+            className="space-y-4"
+          >
             <FormField
-              control={form.control}
+              control={formCreate.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -155,8 +231,48 @@ export default function DashboardCategoryContent({}: Props) {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button type="submit" disabled={formCreate.formState.isSubmitting}>
                 {loading ? <ButtonLoader /> : "Add"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </FormDialog>
+
+      {/* Edit Category */}
+      <FormDialog
+        openDialog={showEditCategory}
+        setOpenDialog={setShowEditCategory}
+        title="Edit Category"
+      >
+        <Form {...formEdit}>
+          <form
+            onSubmit={formEdit.handleSubmit(onEditSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={formEdit.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Input Category" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center justify-end gap-x-3 relative z-10">
+              <Button
+                variant={"outline"}
+                type="button"
+                onClick={() => setShowEditCategory(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={formEdit.formState.isSubmitting}>
+                {editLoading ? <ButtonLoader /> : "Save Changes"}
               </Button>
             </div>
           </form>
