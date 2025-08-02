@@ -12,7 +12,7 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   username: z.string().min(1, { error: "Please enter your username" }),
-  password: z.string({ error: "Please enter your password" }),
+  password: z.string().min(1, { error: "Please enter your password" }),
 });
 
 export const createArticleSchema = z.object({
@@ -21,8 +21,8 @@ export const createArticleSchema = z.object({
     .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
       message: "Only JPG, JPEG or PNG image files are allowed.",
     }).nullable(),
-  title: z.string({ error: "Please enter title" }),
-  category: z.string({ error: "Please select category" }),
+  title: z.string().min(1, { error: "Please enter title" }),
+  category: z.string().min(1, { error: "Please select category" }),
   content: z
     .string()
     .min(1, "Content field cannot be empty")
@@ -43,8 +43,8 @@ export const editArticleSchema = z.object({
     .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
       message: "Only JPG, JPEG or PNG image files are allowed.",
     }).nullable(),
-  title: z.string({ error: "Please enter title" }),
-  categoryId: z.string({ error: "Please select category" }),
+  title: z.string().min(1, { error: "Please enter title" }),
+  categoryId: z.string().min(1, { error: "Please select category" }),
   content: z
     .string()
     .min(1, "Content field cannot be empty")
