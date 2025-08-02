@@ -25,7 +25,7 @@ export default function AdminLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${archivo.className} antialiased`}>
+      <body className={`${archivo.className} antialiased bg bg-gray-100`}>
         <SidebarProvider>
           <AppSidebar />
           <Navbar isAdmin />

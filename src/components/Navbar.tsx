@@ -33,12 +33,14 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
 
   const handleLogout = () => {
     Cookies.remove("ACCESS_TOKEN");
-    Cookies.remove("USER_ROLE")
-    window.location.href = "/login"
+    Cookies.remove("USER_ROLE");
+    window.location.href = "/login";
   };
   return (
     <header
-      className={`absolute top-0 left-0 right-0 w-full py-3 border-b h-16 flex flex-col justify-center ${isAdmin && 'pl-64'} ${
+      className={`absolute top-0 left-0 right-0 w-full py-3 border-b h-16 flex flex-col justify-center bg-gray-50 ${
+        isAdmin && "pl-64 text-slate-900"
+      } ${
         pathname !== "/articles" ? "border-b-slate-200" : "border-b-transparent"
       }`}
     >
@@ -56,7 +58,9 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
                 />
               </Link>
             ) : (
-              <h2 className="font-semibold text-xl text-slate-900">{getPageTitle(pathname)}</h2>
+              <h2 className="font-semibold text-xl text-slate-900">
+                {getPageTitle(pathname)}
+              </h2>
             )}
 
             <DropdownMenu>
@@ -66,14 +70,20 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
                     {data?.username.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <p className="font-medium underline text-white">
+                <p className="font-medium underline text-inherit text-sm">
                   {data?.username}
                 </p>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => router.push("/profile")}
+                  onClick={() =>
+                    router.push(
+                      pathname.includes("/dashboard")
+                        ? "/dashboard/user-profile"
+                        : "/profile"
+                    )
+                  }
                 >
                   My Account
                 </DropdownMenuItem>
