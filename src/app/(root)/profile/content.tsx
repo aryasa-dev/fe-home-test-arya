@@ -20,7 +20,7 @@ export function ProfileContent({}: Props) {
 
   return (
     <section className="pt-16 min-h-screen flex flex-col justify-center items-center">
-      <div className="w-[400px] max-w-xl mx-auto text-center">
+      <div className="w-full md:w-[400px] max-w-xl mx-auto px-5  text-center">
         <h3 className="text-xl font-semibold text-slate-900">User Profile</h3>
 
         <div className="mt-9">

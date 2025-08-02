@@ -16,6 +16,8 @@ import { LogOutIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { getPageTitle } from "@/lib/utils";
 import { LogoutDialog } from "./LogoutDialog";
+import { SidebarTrigger } from "./ui/sidebar";
+import { Separator } from "./ui/separator";
 
 type NavbarProps = {
   isAdmin?: boolean;
@@ -36,7 +38,7 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
     <>
       <header
         className={`absolute top-0 left-0 right-0 w-full py-3 border-b h-16 flex flex-col justify-center bg-gray-50 ${
-          isAdmin && "pl-64 text-slate-900"
+          isAdmin && "text-slate-900"
         } ${
           pathname !== "/articles"
             ? "border-b-slate-200"
@@ -46,21 +48,32 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
         <nav className="bg-transparent">
           <div className="container">
             <div className="flex items-center justify-between">
-              {!isAdmin ? (
-                <Link href={"/"}>
-                  <Image
-                    src={"/images/logo.png"}
-                    alt="logo"
-                    width={200}
-                    height={150}
-                    className="w-auto h-auto"
-                  />
-                </Link>
-              ) : (
-                <h2 className="font-semibold text-xl text-slate-900">
-                  {getPageTitle(pathname)}
-                </h2>
-              )}
+              <div className="flex items-center gap-x-2">
+                {isAdmin && (
+                  <>
+                    <SidebarTrigger className="-ml-2" />
+                    <Separator
+                      orientation="vertical"
+                      className="mx-1 data-[orientation=vertical]:h-4"
+                    />
+                  </>
+                )}
+                {!isAdmin ? (
+                  <Link href={"/"}>
+                    <Image
+                      src={"/images/logo.png"}
+                      alt="logo"
+                      width={200}
+                      height={150}
+                      className="w-32 h-6 object-contain"
+                    />
+                  </Link>
+                ) : (
+                  <h2 className="font-semibold text-xl text-slate-900">
+                    {getPageTitle(pathname)}
+                  </h2>
+                )}
+              </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-x-2 cursor-pointer">

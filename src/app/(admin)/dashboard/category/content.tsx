@@ -128,14 +128,12 @@ export default function DashboardCategoryContent({}: Props) {
   }
 
   const filteredCategoriesData = useMemo(() => {
-    if (!search) return getCategories.data?.data ?? []
+    if (!search) return getCategories.data?.data ?? [];
 
-    return (
-      getCategories.data?.data.filter((item) => 
-        item.name.toLowerCase().includes(search.toLowerCase())
-      )
-    )
-  }, [getCategories.data, search])
+    return getCategories.data?.data.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [getCategories.data, search]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -176,15 +174,13 @@ export default function DashboardCategoryContent({}: Props) {
             <p>Total Category: {getCategories.data?.totalData}</p>
           </div>
           <Separator />
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-x-2">
-              <SearchInput
-                value={search}
-                setValue={setSearch}
-                placeholder="Search by title"
-                className="min-w-[240px] border border-border rounded-md"
-              />
-            </div>
+          <div className="flex items-start md:items-center flex-col md:flex-row justify-between p-6 gap-y-2">
+            <SearchInput
+              value={search}
+              setValue={setSearch}
+              placeholder="Search by title"
+              className="w-full sm:w-auto sm:min-w-[240px] border border-border rounded-md"
+            />
 
             <Button
               onClick={() => {
@@ -208,7 +204,9 @@ export default function DashboardCategoryContent({}: Props) {
               totalItems={filteredCategoriesData?.length ?? 0}
               onPageChange={(newPage) => setPage(newPage)}
             />
-          ) : <DataLoader className="mt-5" />}
+          ) : (
+            <DataLoader className="mt-5" />
+          )}
         </CardContent>
       </Card>
 

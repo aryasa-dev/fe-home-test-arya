@@ -3,8 +3,9 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { DataLoader } from "@/components/DataLoader";
 import { Hero } from "@/components/Hero";
 import { Pagination } from "@/components/Pagination";
+import { Badge } from "@/components/ui/badge";
 import { useApi } from "@/hooks/useApi";
-import { ArticlesResponse } from "@/types";
+import { ArticlesResponse, CategoriesResponse } from "@/types";
 import { useEffect, useState } from "react";
 
 export function ArticlesContent() {
@@ -23,6 +24,12 @@ export function ArticlesContent() {
       manual: true,
     }
   );
+
+  const {data: categories} = useApi<CategoriesResponse>({
+    method: "GET",
+    path: 'categories',
+    auth: true,
+  })
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -48,6 +55,7 @@ export function ArticlesContent() {
         setCategoryValue={setCategory}
         searchValue={search}
         setSearchValue={setSearch}
+        data={categories?.data ?? []}
       />
 
       {/* List */}
@@ -58,6 +66,27 @@ export function ArticlesContent() {
               <p>
                 Showing: {data.data.length} of {data.total}
               </p>
+
+              <div className={`${category || search ? 'flex' : 'hidden'} items-center gap-2 text-sm my-2.5 lg:mb-0`}>
+              {category && (
+                <Badge variant={"secondary"}>
+                  {categories?.data.find((item) => item.id === category)?.name}
+                </Badge>
+              )}
+              {search && <Badge variant={"secondary"}>"{search}"</Badge>}
+
+              {category || search ? (
+                <span
+                  className="text-red-500 underline cursor-pointer"
+                  onClick={() => {
+                    setCategory("");
+                    setSearch("");
+                  }}
+                >
+                  Reset
+                </span>
+              ) : null}
+            </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-[60px] mt-6 mb-10 h-full">
                 {data.data.map((article) => (

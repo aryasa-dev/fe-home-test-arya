@@ -41,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   return (
     <>
-      <Sidebar {...props} className="text-white">
+      <Sidebar collapsible="offcanvas" {...props} className="text-white">
         <SidebarHeader>
           <Image
             src={"/images/logo-white.png"}

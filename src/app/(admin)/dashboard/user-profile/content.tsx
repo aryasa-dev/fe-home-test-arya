@@ -14,7 +14,7 @@ export function DashboardProfileContent() {
   });
   return (
     <div className="bg-white text-center w-full h-full pt-20 rounded-sm">
-      <div className="w-[400px] max-w-xl mx-auto">
+      <div className="w-full md:max-w-[400px] lg:w-[400px] max-w-xl mx-auto">
         <h3 className="text-xl font-semibold text-slate-900">User Profile</h3>
 
         <div className="mt-9">

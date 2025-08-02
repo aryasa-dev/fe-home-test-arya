@@ -82,7 +82,7 @@ export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
               <b className="text-xl font-bold text-slate-900 block mb-6">
                 Other articles
               </b>
-              <div className="grid grid-cols-3 gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {otherArticles?.map((article) => (
                   <ArticleCard
                     key={article.id}

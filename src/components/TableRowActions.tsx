@@ -48,20 +48,20 @@ export function TableRowActions({
   };
   return (
     <>
-      <div className="flex items-center justify-center">
-        {linkToPreview && <Link href={linkToPreview}><Button variant={"link"}>Preview</Button></Link>}
+      <div className="flex items-center justify-center gap-3">
+        {linkToPreview && <Link href={linkToPreview}><Button className="px-0" variant={"link"}>Preview</Button></Link>}
         {linkToEdit ? (
           <Link href={linkToEdit}>
-            <Button variant={"link"}>Edit</Button>
+            <Button className="px-0" variant={"link"}>Edit</Button>
           </Link>
         ) : (
-          <Button variant={"link"} onClick={onEditAction}>
+          <Button className="px-0" variant={"link"} onClick={onEditAction}>
             Edit
           </Button>
         )}
         <Button
           variant={"link"}
-          className="text-red-500"
+          className="text-red-500 px-0"
           onClick={() => setOpenAlert(true)}
         >
           Delete

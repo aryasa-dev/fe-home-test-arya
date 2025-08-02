@@ -70,23 +70,24 @@ export function ArticlesContent({}: Props) {
           <p>Total Articles: {articles?.total}</p>
         </div>
         <Separator />
-        <div className="flex items-start justify-between p-6">
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-x-2">
+        <div className="flex items-start flex-col lg:flex-row justify-between p-6">
+          <div className="space-y-2.5 w-full">
+            <div className="flex items-center w-full gap-x-2">
               <SelectComponent
                 label="Category"
                 data={data?.data ?? []}
                 value={category}
                 setValue={setCategory}
+                className="w-1/2 lg:w-auto"
               />
               <SearchInput
                 value={search}
                 setValue={setSearch}
                 placeholder="Search by title"
-                className="min-w-[240px] border border-border rounded-md"
+                className="w-1/2 lg:w-auto lg:min-w-[240px] border border-border rounded-md"
               />
             </div>
-            <div className="flex items-center gap-2 text-sm">
+            <div className={`${category || search ? 'flex' : 'hidden'} items-center gap-2 text-sm mb-2.5 lg:mb-0`}>
               {category && (
                 <Badge variant={"secondary"}>
                   {data?.data.find((item) => item.id === category)?.name}

@@ -21,7 +21,7 @@ export default function SearchInput({ value, setValue, placeholder = "Search art
         onChange={(e) => {
           setValue(e.target.value);
         }}
-        className="border-none outline-none focus-visible:ring-transparent focus-visible:border-none shadow-none w-full"
+        className="border-none outline-none focus-visible:ring-transparent focus-visible:border-none shadow-none w-full text-sm placeholder:text-sm"
       />
     </div>
   );

@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 type SelectComponentProps = {
   data: {
@@ -17,6 +18,7 @@ type SelectComponentProps = {
   label: string;
   value: string;
   setValue: (value: string) => void;
+  className?: string
 };
 
 export function SelectComponent({
@@ -24,10 +26,11 @@ export function SelectComponent({
   label,
   setValue,
   value,
+  className
 }: SelectComponentProps) {
   return (
     <Select onValueChange={setValue} value={value}>
-      <SelectTrigger className="bg-white !p-3 w-full">
+      <SelectTrigger className={cn("bg-white !p-3 w-full rounded-[6px]", className)}>
         <SelectValue placeholder="Select category" />
       </SelectTrigger>
       <SelectContent>
