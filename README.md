@@ -1,5 +1,4 @@
-This is Home Test Frontend Web Developer by Arya
-Built using **Next.js 14.2.30 with the App Router**, organized using **Route Groups** to separate public, admin, and authentication areas
+This is Home Test Frontend Web Developer by Arya, built using **Next.js 14.2.30 with the App Router**, organized using **Route Groups** to separate public, admin, and authentication areas
 
 ## Tech Stack
 
