@@ -3,7 +3,7 @@ import z from "zod";
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png"];
 
 export const registerSchema = z.object({
-  username: z.string({error: "Username field cannot be empty"}),
+  username: z.string().min(1, {error: "Username field cannot be empty"}),
   password: z
     .string()
     .min(8, { error: "Password must be at least 8 characters long" }),
@@ -11,7 +11,7 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  username: z.string({ error: "Please enter your username" }),
+  username: z.string().min(1, { error: "Please enter your username" }),
   password: z.string({ error: "Please enter your password" }),
 });
 
