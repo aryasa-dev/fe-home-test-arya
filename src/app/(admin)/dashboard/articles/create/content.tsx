@@ -180,10 +180,11 @@ export function CreateArticleContent({}: Props) {
                 variant={"outline"}
                 type="button"
                 onClick={() => router.push("/dashboard/articles")}
+                disabled={form.formState.isSubmitting}
               >
                 Cancel
               </Button>
-              <Button variant={"ghost"}>Preview</Button>
+              <Button variant={"ghost"} disabled={form.formState.isSubmitting}>Preview</Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 {isSubmitting ? <ButtonLoader /> : "Upload"}
               </Button>

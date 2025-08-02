@@ -1,24 +1,22 @@
 "use client";
 import { ArticleCard } from "@/components/ArticleCard";
+import { DataLoader } from "@/components/DataLoader";
 import { useApi } from "@/hooks/useApi";
 import { formattedDate } from "@/lib/utils";
 import { Article, ArticlesResponse } from "@/types";
-import { ArrowLeftIcon } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 
-type PreviewArticleContentProps = {
+type DetailArticleContentProps = {
   id: string;
 };
 
-export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
+export function DetailArticleContent({ id }: DetailArticleContentProps) {
   const { data, loading, error } = useApi<Article>({
     method: "GET",
     path: `articles/${id}`,
     auth: true,
   });
-  const router = useRouter();
 
   const { data: articles, refetch } = useApi<ArticlesResponse>(
     {
@@ -47,15 +45,8 @@ export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
   if (error) return <div>Ooops! Sorry something went wrong.</div>;
 
   return (
-    <section className="min-h-screen pb-10">
+    <section className="min-h-screen pt-20 pb-10">
       <div className="container">
-        <div className="flex items-center gap-3 pb-5">
-          <ArrowLeftIcon
-            onClick={() => router.push("/dashboard/articles")}
-            className="cursor-pointer"
-          />
-          <p className="font-medium text-slate-900">Preview Article</p>
-        </div>
         {!loading && data ? (
           <div>
             <div className="flex items-center justify-center gap-x-1.5 text-slate-600 font-medium text-sm">
@@ -69,7 +60,7 @@ export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
             </h2>
 
             <Image
-              src={data.imageUrl ?? '/images/article-img.png'}
+              src={data.imageUrl ?? "/images/article-img.png"}
               alt={data.title}
               width={800}
               height={400}
@@ -98,7 +89,7 @@ export function PreviewArticleContent({ id }: PreviewArticleContentProps) {
             </div>
           </div>
         ) : (
-          <p>Loading...</p>
+          <DataLoader />
         )}
       </div>
     </section>

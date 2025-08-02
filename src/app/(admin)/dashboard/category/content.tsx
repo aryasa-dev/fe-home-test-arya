@@ -24,6 +24,7 @@ import { createCategory, editCategory } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { ButtonLoader } from "@/components/ButtonLoader";
+import { DataLoader } from "@/components/DataLoader";
 
 type Props = {};
 
@@ -40,6 +41,7 @@ export default function DashboardCategoryContent({}: Props) {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showEditCategory, setShowEditCategory] = useState(false);
   const [idCategory, setIdCategory] = useState<string | null>(null);
+  const [getDataLoading, setGetDataLoading] = useState(true);
 
   // get categories
   const getCategories = useApi<CategoriesResponse>(
@@ -120,7 +122,6 @@ export default function DashboardCategoryContent({}: Props) {
   }
 
   async function onEditSubmit(values: z.infer<typeof createCategory>) {
-    console.log(values);
     await editCategoryRefetch({
       bodyRequest: values,
     });
@@ -128,13 +129,15 @@ export default function DashboardCategoryContent({}: Props) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      getCategories.refetch({
-        params: {
-          search: search || undefined,
-          page,
-          limit,
-        },
-      });
+      getCategories
+        .refetch({
+          params: {
+            search: search || undefined,
+            page,
+            limit,
+          },
+        })
+        .finally(() => setGetDataLoading(false));
     }, 300);
 
     return () => clearTimeout(timeout);
@@ -153,38 +156,39 @@ export default function DashboardCategoryContent({}: Props) {
     }
   }, [idCategory, getCategoryDetail, formEdit]);
 
-  if (getCategories.loading) return <p>Loading...</p>
+  if (getCategories.error) return <div>Ooops! Sorry something went wrong.</div>;
 
   return (
     <>
-      {/* {!getCategories.loading ? ( */}
-        <Card className="w-full h-full">
-          <CardHeader className="p-0">
-            <div className="pb-6 px-6">
-              <p>Total Category: {getCategories.data?.totalData}</p>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between p-6">
-              <div className="flex items-center gap-x-2">
-                <SearchInput
-                  value={search}
-                  setValue={setSearch}
-                  placeholder="Search by title"
-                />
-              </div>
-
-              <Button
-                onClick={() => {
-                  setIdCategory(null);
-                  setShowAddCategory(true);
-                }}
-              >
-                <PlusIcon /> Add Category
-              </Button>
-            </div>
-          </CardHeader>
+      <Card className="w-full h-full">
+        <CardHeader className="p-0">
+          <div className="pb-6 px-6">
+            <p>Total Category: {getCategories.data?.totalData}</p>
+          </div>
           <Separator />
-          <CardContent className="p-0 mt-0">
+          <div className="flex items-center justify-between p-6">
+            <div className="flex items-center gap-x-2">
+              <SearchInput
+                value={search}
+                setValue={setSearch}
+                placeholder="Search by title"
+              />
+            </div>
+
+            <Button
+              onClick={() => {
+                setIdCategory(null);
+                setShowAddCategory(true);
+              }}
+              disabled={getDataLoading}
+            >
+              <PlusIcon /> Add Category
+            </Button>
+          </div>
+        </CardHeader>
+        <Separator />
+        <CardContent className="p-0 mt-0">
+          {!getDataLoading && getCategories.data ? (
             <DataTable
               columns={columns}
               data={getCategories.data?.data ?? []}
@@ -193,11 +197,9 @@ export default function DashboardCategoryContent({}: Props) {
               totalItems={getCategories.data?.totalData ?? 0}
               onPageChange={(newPage) => setPage(newPage)}
             />
-          </CardContent>
-        </Card>
-      {/* ) : (
-        <p className="p-6">Loading..</p>
-      )} */}
+          ) : <DataLoader className="mt-5" />}
+        </CardContent>
+      </Card>
 
       {/* Create Category */}
       <FormDialog
@@ -228,10 +230,14 @@ export default function DashboardCategoryContent({}: Props) {
                 variant={"outline"}
                 type="button"
                 onClick={() => setShowAddCategory(false)}
+                disabled={formCreate.formState.isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={formCreate.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={formCreate.formState.isSubmitting}
+              >
                 {loading ? <ButtonLoader /> : "Add"}
               </Button>
             </div>
@@ -268,6 +274,7 @@ export default function DashboardCategoryContent({}: Props) {
                 variant={"outline"}
                 type="button"
                 onClick={() => setShowEditCategory(false)}
+                disabled={formEdit.formState.isSubmitting}
               >
                 Cancel
               </Button>

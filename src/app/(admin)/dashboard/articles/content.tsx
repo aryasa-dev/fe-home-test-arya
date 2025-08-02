@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import { ArticlesResponse, CategoriesResponse } from "@/types";
@@ -11,6 +11,7 @@ import SearchInput from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
+import { DataLoader } from "@/components/DataLoader";
 
 type Props = {};
 
@@ -24,6 +25,7 @@ export function ArticlesContent({}: Props) {
     data: articles,
     loading: articlesLoading,
     refetch,
+    error,
   } = useApi<ArticlesResponse>(
     {
       method: "GET",
@@ -40,6 +42,7 @@ export function ArticlesContent({}: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [getDataLoading, setGetDataLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -51,11 +54,14 @@ export function ArticlesContent({}: Props) {
           page,
           limit,
         },
-      });
+      }).finally(() => setGetDataLoading(false));
     }, 300);
 
     return () => clearTimeout(timeout);
   }, [page, limit, category, search]);
+
+  if (error) return <div>Ooops! Sorry something went wrong.</div>;
+
   return (
     <Card className="w-full h-full">
       <CardHeader className="p-0">
@@ -78,16 +84,17 @@ export function ArticlesContent({}: Props) {
             />
           </div>
 
-          <Button onClick={() => router.push("articles/create")}>
+          <Button
+            onClick={() => router.push("articles/create")}
+            disabled={getDataLoading}
+          >
             <PlusIcon /> Add Articles
           </Button>
         </div>
       </CardHeader>
       <Separator />
       <CardContent className="p-0 mt-0">
-        {articlesLoading ? (
-          <p className="p-6">Loading..</p>
-        ) : (
+        {!getDataLoading && articles ? (
           <DataTable
             columns={columns}
             data={articles?.data ?? []}
@@ -96,6 +103,8 @@ export function ArticlesContent({}: Props) {
             totalItems={articles?.total ?? 0}
             onPageChange={(newPage) => setPage(newPage)}
           />
+        ) : (
+          <DataLoader className="mt-5" />
         )}
       </CardContent>
     </Card>
