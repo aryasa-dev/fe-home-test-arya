@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import { LogOutIcon, NewspaperIcon, TagIcon } from "lucide-react";
 import { LogoutDialog } from "./LogoutDialog";
+import { usePathname } from "next/navigation";
 
 const items = [
   {
@@ -37,16 +38,17 @@ const items = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const pathname = usePathname()
   return (
     <>
       <Sidebar {...props} className="text-white">
         <SidebarHeader>
           <Image
-            src={"/images/logo.png"}
+            src={"/images/logo-white.png"}
             alt="logo"
-            width={250}
-            height={150}
-            className="w-auto h-auto"
+            width={150}
+            height={50}
+            className="w-auto h-auto max-w-32 max-h-6 object-contain mb-6"
           />
         </SidebarHeader>
         <SidebarContent>
@@ -55,7 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild className={pathname === item.url ? 'bg-blue-500' : ''}>
                       {item.url ? (
                         <a href={item.url}>
                           <item.icon />
