@@ -12,7 +12,7 @@ export const useApi = <T = any>(
   options?: UseApiOptions<T>
 ) => {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!options?.manual);
   const [error, setError] = useState<any>(null);
 
   const fetchData = async (overrideProps?: Partial<Parameters<typeof apiRequest>[0]>) => {

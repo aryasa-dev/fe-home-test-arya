@@ -48,7 +48,6 @@ export default function LoginPage() {
         } else {
           router.push("/dashboard")
         }
-        // window.location.href = "/";
       },
       onError: (err) => {
         console.error(err.response?.data);
