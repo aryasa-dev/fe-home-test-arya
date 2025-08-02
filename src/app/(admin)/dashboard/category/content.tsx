@@ -127,12 +127,22 @@ export default function DashboardCategoryContent({}: Props) {
     });
   }
 
+  const filteredCategoriesData = useMemo(() => {
+    if (!search) return getCategories.data?.data ?? []
+
+    return (
+      getCategories.data?.data.filter((item) => 
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
+    )
+  }, [getCategories.data, search])
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       getCategories
         .refetch({
           params: {
-            search: search || undefined,
+            // search: search || undefined,
             page,
             limit,
           },
@@ -141,7 +151,7 @@ export default function DashboardCategoryContent({}: Props) {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [page, limit, search]);
+  }, [page, limit]);
 
   useEffect(() => {
     if (idCategory && getCategoryDetail) {
@@ -172,6 +182,7 @@ export default function DashboardCategoryContent({}: Props) {
                 value={search}
                 setValue={setSearch}
                 placeholder="Search by title"
+                className="min-w-[240px] border border-border rounded-md"
               />
             </div>
 
@@ -191,10 +202,10 @@ export default function DashboardCategoryContent({}: Props) {
           {!getDataLoading && getCategories.data ? (
             <DataTable
               columns={columns}
-              data={getCategories.data?.data ?? []}
+              data={filteredCategoriesData ?? []}
               page={page}
               pageSize={limit}
-              totalItems={getCategories.data?.totalData ?? 0}
+              totalItems={filteredCategoriesData?.length ?? 0}
               onPageChange={(newPage) => setPage(newPage)}
             />
           ) : <DataLoader className="mt-5" />}

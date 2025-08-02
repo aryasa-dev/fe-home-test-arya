@@ -56,7 +56,6 @@ export default function LoginPage() {
   );
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
     await refetch({ bodyRequest: values });
   }
   return (

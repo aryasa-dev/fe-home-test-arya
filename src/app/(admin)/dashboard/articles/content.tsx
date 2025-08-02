@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
 import { DataLoader } from "@/components/DataLoader";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {};
 
@@ -69,19 +70,42 @@ export function ArticlesContent({}: Props) {
           <p>Total Articles: {articles?.total}</p>
         </div>
         <Separator />
-        <div className="flex items-center justify-between p-6">
-          <div className="flex items-center gap-x-2">
-            <SelectComponent
-              label="Category"
-              data={data?.data ?? []}
-              value={category}
-              setValue={setCategory}
-            />
-            <SearchInput
-              value={search}
-              setValue={setSearch}
-              placeholder="Search by title"
-            />
+        <div className="flex items-start justify-between p-6">
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-x-2">
+              <SelectComponent
+                label="Category"
+                data={data?.data ?? []}
+                value={category}
+                setValue={setCategory}
+              />
+              <SearchInput
+                value={search}
+                setValue={setSearch}
+                placeholder="Search by title"
+                className="min-w-[240px] border border-border rounded-md"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              {category && (
+                <Badge variant={"secondary"}>
+                  {data?.data.find((item) => item.id === category)?.name}
+                </Badge>
+              )}
+              {search && <Badge variant={"secondary"}>"{search}"</Badge>}
+
+              {category || search ? (
+                <span
+                  className="text-red-500 underline cursor-pointer"
+                  onClick={() => {
+                    setCategory("");
+                    setSearch("");
+                  }}
+                >
+                  Reset
+                </span>
+              ) : null}
+            </div>
           </div>
 
           <Button
