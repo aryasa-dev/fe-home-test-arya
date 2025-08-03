@@ -128,12 +128,21 @@ export default function DashboardCategoryContent({}: Props) {
   }
 
   const filteredCategoriesData = useMemo(() => {
-    if (!search) return getCategories.data?.data ?? [];
+    const allData = getCategories.data?.data ?? [];
 
-    return getCategories.data?.data.filter((item) =>
-      item.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filtered = search
+      ? allData.filter((item) =>
+          item.name.toLowerCase().includes(search.toLowerCase())
+        )
+      : allData;
+
+    return filtered;
   }, [getCategories.data, search]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    return filteredCategoriesData.slice(startIndex, startIndex + limit);
+  }, [filteredCategoriesData, page, limit]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -141,15 +150,15 @@ export default function DashboardCategoryContent({}: Props) {
         .refetch({
           params: {
             // search: search || undefined,
-            page,
-            limit,
+            page: 1,
+            limit: 1000,
           },
         })
         .finally(() => setGetDataLoading(false));
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [page, limit]);
+  }, []);
 
   useEffect(() => {
     if (idCategory && getCategoryDetail) {
@@ -177,7 +186,10 @@ export default function DashboardCategoryContent({}: Props) {
           <div className="flex items-start md:items-center flex-col md:flex-row justify-between p-6 gap-y-2">
             <SearchInput
               value={search}
-              setValue={setSearch}
+              setValue={(value: string) => {
+                setSearch(value)
+                setPage(1)
+              }}
               placeholder="Search by title"
               className="w-full sm:w-auto sm:min-w-[240px] border border-border rounded-md"
             />
@@ -198,10 +210,10 @@ export default function DashboardCategoryContent({}: Props) {
           {!getDataLoading && getCategories.data ? (
             <DataTable
               columns={columns}
-              data={filteredCategoriesData ?? []}
+              data={paginatedData ?? []}
               page={page}
               pageSize={limit}
-              totalItems={filteredCategoriesData?.length ?? 0}
+              totalItems={filteredCategoriesData.length ?? 0}
               onPageChange={(newPage) => setPage(newPage)}
             />
           ) : (

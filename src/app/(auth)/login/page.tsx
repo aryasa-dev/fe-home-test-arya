@@ -39,7 +39,7 @@ export default function LoginPage() {
     },
     {
       manual: true,
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
         Cookies.set("ACCESS_TOKEN", res.token);
         Cookies.set("USER_ROLE", res.role)
 
@@ -51,6 +51,7 @@ export default function LoginPage() {
       },
       onError: (err) => {
         console.error(err.response?.data);
+        alert(err.response?.data.error)
       },
     }
   );
