@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useApi } from "@/hooks/useApi";
 import { User } from "@/types";
@@ -33,6 +33,12 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem("user", data.username)
+    }
+  }, [data])
 
   return (
     <>

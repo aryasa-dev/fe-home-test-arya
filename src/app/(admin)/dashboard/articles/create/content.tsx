@@ -1,5 +1,5 @@
-"use client"
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeftIcon, ChevronDownIcon, Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,12 +19,13 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useApi } from "@/hooks/useApi";
-import { CategoriesResponse } from "@/types";
+import { CategoriesResponse, CreateArticle } from "@/types";
 import UploadImage from "@/components/UploadImage";
 import Link from "next/link";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { uploadImage } from "@/services";
 import { ButtonLoader } from "@/components/ButtonLoader";
+import { PreviewDialog } from "@/components/PreviewDialog";
 
 type Props = {};
 
@@ -42,6 +43,18 @@ export function CreateArticleContent({}: Props) {
     path: "categories",
     auth: true,
   });
+
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewData, setPreviewData] = useState<CreateArticle | null>(null);
+  const [user, setUser] = useState<string | null>(null)
+  const watchedTitle = form.watch("title");
+  const watchedContent = form.watch("content");
+  const watchedThumbnail = form.watch("thumbnail");
+
+  const isFormEmpty =
+    !watchedTitle?.trim() &&
+    !watchedContent?.trim() &&
+    !(watchedThumbnail instanceof File);
 
   const { refetch: addArticle, loading: isSubmitting } = useApi(
     {
@@ -62,6 +75,23 @@ export function CreateArticleContent({}: Props) {
     }
   );
 
+  const handlePreview = async () => {
+    const values = form.getValues();
+    let image: string | null = null
+
+    if (values.thumbnail instanceof File) {
+      image = await uploadImage(values.thumbnail);
+    }
+
+    setPreviewData({
+      title: values.title,
+      content: values.content,
+      imageUrl: image,
+    });
+
+    setShowPreview(true);
+  };
+
   async function onSubmit(values: z.infer<typeof createArticleSchema>) {
     let imageUrl: string | null = null;
 
@@ -80,118 +110,143 @@ export function CreateArticleContent({}: Props) {
       bodyRequest: payload,
     });
   }
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-3 pb-5">
-          <ArrowLeftIcon
-            onClick={() => router.push("/dashboard/articles")}
-            className="cursor-pointer"
-          />
-          <p className="font-medium text-slate-900">Create Article</p>
-        </div>
-      </CardHeader>
 
-      <CardContent className="mt-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="thumbnail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <UploadImage {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    setUser(storedUser);
+  }, []);
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3 pb-5">
+            <ArrowLeftIcon
+              onClick={() => router.push("/dashboard/articles")}
+              className="cursor-pointer"
             />
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Input Title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div>
+            <p className="font-medium text-slate-900">Create Article</p>
+          </div>
+        </CardHeader>
+
+        <CardContent className="mt-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="category"
+                name="thumbnail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <div className="relative">
-                      <FormControl>
-                        <select
-                          className={cn(
-                            buttonVariants({ variant: "outline" }),
-                            "w-full appearance-none font-normal"
-                          )}
-                          {...field}
-                        >
-                          <option value="">Select Category</option>
-                          {categories.data?.data.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
-                        </select>
-                      </FormControl>
-                      <ChevronDownIcon className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />
-                    </div>
+                    <FormControl>
+                      <UploadImage {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <span className="text-sm text-slate-500">
-                The existing category list can be seen in the{" "}
-                <Link
-                  href={"/dashboard/category"}
-                  className="text-primary underline"
-                >
-                  category
-                </Link>{" "}
-                menu
-              </span>
-            </div>
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Input Title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <select
+                            className={cn(
+                              buttonVariants({ variant: "outline" }),
+                              "w-full appearance-none font-normal"
+                            )}
+                            {...field}
+                          >
+                            <option value="">Select Category</option>
+                            {categories.data?.data.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                          </select>
+                        </FormControl>
+                        <ChevronDownIcon className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className="text-sm text-slate-500">
+                  The existing category list can be seen in the{" "}
+                  <Link
+                    href={"/dashboard/category"}
+                    className="text-primary underline"
+                  >
+                    category
+                  </Link>{" "}
+                  menu
+                </span>
+              </div>
 
-            {/* Content */}
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <RichTextEditor {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center justify-end gap-x-3 relative z-10">
-              <Button
-                variant={"outline"}
-                type="button"
-                onClick={() => router.push("/dashboard/articles")}
-                disabled={form.formState.isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button variant={"ghost"} disabled={form.formState.isSubmitting}>Preview</Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {isSubmitting ? <ButtonLoader /> : "Upload"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              {/* Content */}
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <RichTextEditor {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center justify-end gap-x-3 relative z-10">
+                <Button
+                  variant={"outline"}
+                  type="button"
+                  onClick={() => router.push("/dashboard/articles")}
+                  disabled={form.formState.isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant={"ghost"}
+                  type="button"
+                  onClick={handlePreview}
+                  disabled={isFormEmpty || form.formState.isSubmitting}
+                >
+                  Preview
+                </Button>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {isSubmitting ? <ButtonLoader /> : "Upload"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      {user && (
+        <PreviewDialog
+          openDialog={showPreview}
+          setOpenDialog={setShowPreview}
+          user={user}
+          content={previewData?.content ?? ""}
+          imageUrl={previewData?.imageUrl ?? undefined}
+          title={previewData?.title ?? ""}
+        />
+      )}
+    </>
   );
 }

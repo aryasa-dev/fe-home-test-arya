@@ -41,3 +41,9 @@ export interface CategoriesResponse {
   currentPage: number;
   totalPages: number;
 }
+
+export interface CreateArticle {
+  title: string
+  imageUrl: string | null
+  content: string
+}

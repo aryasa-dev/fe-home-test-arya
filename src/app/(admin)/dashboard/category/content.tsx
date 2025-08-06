@@ -109,7 +109,7 @@ export default function DashboardCategoryContent({}: Props) {
   const columns = useMemo(
     () =>
       getCategoryColumns(
-        () => getCategories.refetch({ params: { page } }),
+        () => getCategories.refetch({ params: { page: 1, limit: 1000 } }),
         handleEdit
       ),
     [getCategories.refetch, page, handleEdit]

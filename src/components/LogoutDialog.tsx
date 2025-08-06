@@ -25,6 +25,7 @@ export function LogoutDialog({
   const handleLogout = () => {
     Cookies.remove("ACCESS_TOKEN");
     Cookies.remove("USER_ROLE");
+    localStorage.removeItem("user")
     setLogoutLoading(true)
     window.location.href = "/login";
   };

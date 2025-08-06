@@ -26,6 +26,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/articles", request.url));
   }
 
+  if (role === "Admin" && pathname.startsWith("/articles")) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   return NextResponse.next();
 }
 
